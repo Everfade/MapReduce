@@ -10,30 +10,31 @@ class Preprocessing(MRJob):
         data = json.loads(line)
         review_text = data['reviewText']
         category = data['category']
-        WORD_RE = re.compile(r"[\s\t\d\(\)\[\]\{\}\.\!\?,;:\+=\-_\"'`~#@&*%€$§\\/]+")
-        words = WORD_RE.split(review_text.lower())
+        DELIMITERS = r"[\s\t\d\(\)\[\]\{\}\.\!\?,;:\+=\-_\"'`~#@&*%€$§\\/]+"
+        words = re.split(DELIMITERS, review_text.lower())
 
         # stopwards
         stopwords = self.read_stopwords()
-        words = [w for w in words if w not in stopwords and len(w) > 1]
+ 
         for word in words:
-            yield (category, word), 1
+            if word not in stopwords and len(word) > 1:
+                yield (category, word), 1
 
     def reducer_count_words(self, key, values):
         total = sum(values)
         category, word = key
         yield category, (word, total)
 
-    def reducer_chi_square(self, category, word_counts):
-        # Not sure ob das hierher gehört
-        pass
  
     def read_stopwords(self):
         stopwords = set()
         dirname = os.path.dirname(__file__)
        # filename = os.path.join(dirname, 'stopwords.txt')
        #path :)
-        with open("D:\Tu\Master\DataIntensive\Exercise1\stopwords.txt", "r") as file:
+        stopwords = set()
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        stopwords_file = os.path.join(script_dir, 'stopwords.txt')       
+        with open(stopwords_file, "r") as file:
          for line in file.readlines():
             stripped_line = line.strip()   
             stopwords.add(stripped_line)
@@ -43,8 +44,7 @@ class Preprocessing(MRJob):
     def steps(self):
         return [
             MRStep(mapper=self.mapper_preprocess,
-                   reducer=self.reducer_count_words),
-            MRStep(reducer=self.reducer_chi_square)
+                   reducer=self.reducer_count_words)
         ]
 if __name__ == '__main__':
     Preprocessing.run()
