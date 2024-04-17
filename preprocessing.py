@@ -89,9 +89,7 @@ class Preprocessing(MRJob):
     def steps(self):
         return [
             MRStep(mapper=self.mapper_preprocess,
-                   reducer=self.reducer_count_words),
-            MRStep(mapper=self.mapper_count_reviews_per_word,
-                   reducer=self.reducer_sum_reviews_per_word)
+                   reducer=self.reducer_count_words)
         ]
 if __name__ == '__main__':
     Preprocessing.run()
