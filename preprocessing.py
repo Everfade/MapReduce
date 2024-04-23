@@ -41,7 +41,7 @@ class Preprocessing(MRJob):
         category, word = key
         yield word, (category, total)
 
-    def reducer_shit(self, key, values):
+    def reducer_count_words_per_review(self, key, values):
         cats = []
         counts = []
         count_of_cat = {}
@@ -81,7 +81,7 @@ class Preprocessing(MRJob):
         return [
             MRStep(mapper=self.mapper_preprocess,
                    reducer=self.reducer_count_words),
-            MRStep(reducer=self.reducer_shit)
+            MRStep(reducer=self.reducer_count_words_per_review)
         ]
 if __name__ == '__main__':
     Preprocessing.run()

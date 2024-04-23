@@ -73,16 +73,14 @@ class CalculateChi(MRJob):
         category_chi2_values = {}        
         # Store chi2 values for each category
         category_chi2_values[category] = list(pairs)
-        list_terms = []
 
         # Emit the top 75 words for each category
         for cat, word_chi_pair in category_chi2_values.items():
             top75 = sorted(word_chi_pair, key=lambda x: x[1], reverse=True)[:75]
             formatted_top_75 = [f"{word}:{chi2}" for word, chi2 in top75]
             terms = [sublist[0] for sublist in top75]
-            list_terms = list_terms + terms
-            yield cat, ", ".join(formatted_top_75)
-        yield None, " ".join(sorted(list_terms))
+            yield cat, " ".join(formatted_top_75)
+        yield None, " ".join(sorted(terms))
 
 
     def steps(self):
